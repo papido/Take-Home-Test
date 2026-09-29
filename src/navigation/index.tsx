@@ -1,99 +1,41 @@
-import {
-  createBottomTabNavigator,
-  createBottomTabScreen,
-} from '@react-navigation/bottom-tabs';
-import { HeaderButton, Text } from '@react-navigation/elements';
 import { createStaticNavigation } from '@react-navigation/native';
 import {
   createNativeStackNavigator,
   createNativeStackScreen,
 } from '@react-navigation/native-stack';
-import { Image } from 'react-native';
-import bell from '../assets/bell.png';
-import newspaper from '../assets/newspaper.png';
+import { useAuth } from '../context/AuthContext';
 import { Home } from './screens/Home';
-import { NotFound } from './screens/NotFound';
-import { Profile } from './screens/Profile';
-import { Settings } from './screens/Settings';
-import { Updates } from './screens/Updates';
+import { Login } from './screens/Login';
+import { Signup } from './screens/Signup';
 
-const HomeTabs = createBottomTabNavigator({
-  screens: {
-    Home: createBottomTabScreen({
-      screen: Home,
-      options: {
-        title: 'Feed',
-        tabBarIcon: ({ color, size }) => (
-          <Image
-            source={newspaper}
-            tintColor={color}
-            style={{
-              width: size,
-              height: size,
-            }}
-          />
-        ),
-      },
-    }),
-    Updates: createBottomTabScreen({
-      screen: Updates,
-      options: {
-        tabBarIcon: ({ color, size }) => (
-          <Image
-            source={bell}
-            tintColor={color}
-            style={{
-              width: size,
-              height: size,
-            }}
-          />
-        ),
-      },
-    }),
-  },
-});
+function useIsSignedIn() {
+  return useAuth().user !== null;
+}
+
+function useIsSignedOut() {
+  return useAuth().user === null;
+}
 
 const RootStack = createNativeStackNavigator({
-  screens: {
-    HomeTabs: createNativeStackScreen({
-      screen: HomeTabs,
-      options: {
-        title: 'Home',
-        headerShown: false,
+  groups: {
+    SignedOut: {
+      if: useIsSignedOut,
+      screens: {
+        Login,
+        Signup,
       },
-    }),
-    Profile: createNativeStackScreen({
-      screen: Profile,
-      linking: {
-        path: ':user(@[a-zA-Z0-9-_]+)',
-        parse: {
-          user: (value) => value.replace(/^@/, ''),
-        },
-        stringify: {
-          user: (value) => `@${value}`,
-        },
+    },
+    SignedIn: {
+      if: useIsSignedIn,
+      screens: {
+        Home: createNativeStackScreen({
+          screen: Home,
+          options: {
+            title: 'Home',
+          },
+        }),
       },
-    }),
-    Settings: createNativeStackScreen({
-      screen: Settings,
-      options: ({ navigation }) => ({
-        presentation: 'modal',
-        headerRight: () => (
-          <HeaderButton onPress={navigation.goBack}>
-            <Text>Close</Text>
-          </HeaderButton>
-        ),
-      }),
-    }),
-    NotFound: createNativeStackScreen({
-      screen: NotFound,
-      options: {
-        title: '404',
-      },
-      linking: {
-        path: '*',
-      },
-    }),
+    },
   },
 });
 

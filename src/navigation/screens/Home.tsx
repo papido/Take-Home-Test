@@ -1,15 +1,28 @@
 import { Button, Text } from '@react-navigation/elements';
+import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
+import { useAuth } from '../../context/AuthContext';
 
 export function Home() {
+  const { user, logout } = useAuth();
+  const [error, setError] = useState('');
+
+  async function handleLogout() {
+    setError('');
+
+    try {
+      await logout();
+    } catch {
+      setError('Could not log out. Please try again.');
+    }
+  }
+
   return (
     <View style={styles.container}>
-      <Text>Home Screen</Text>
-      <Text>Open up 'src/App.tsx' to start working on your app!</Text>
-      <Button screen="Profile" params={{ user: 'jane' }}>
-        Go to Profile
-      </Button>
-      <Button screen="Settings">Go to Settings</Button>
+      <Text style={styles.title}>Welcome, {user?.name}</Text>
+      <Text style={styles.email}>{user?.email}</Text>
+      {error ? <Text style={styles.error}>{error}</Text> : null}
+      <Button onPress={handleLogout}>Logout</Button>
     </View>
   );
 }
@@ -19,6 +32,21 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 10,
+    gap: 14,
+    backgroundColor: '#f3f6fb',
+    padding: 24,
+  },
+  title: {
+    color: '#172033',
+    fontSize: 28,
+    fontWeight: '700',
+  },
+  email: {
+    color: '#5e687a',
+    fontSize: 16,
+  },
+  error: {
+    color: '#b42318',
+    fontSize: 14,
   },
 });
