@@ -9,7 +9,7 @@ npm install
 npx expo start --go
 ```
 
-Scan the QR code with Expo Go. `npm start` starts the development-client build instead.
+Scan the QR code and open the app with Expo Go.
 
 ## Authentication
 
